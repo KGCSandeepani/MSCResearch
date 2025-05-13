@@ -1,0 +1,231 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Prediction</title>
+</head>
+<body>
+    <h2>Upload Source Code Data (CSV)</h2>
+    <form action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Predict</button>
+    </form>
+</body>
+</html> -->
+
+<!-- v2
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .buggy {
+            background-color: #ff6666;
+            color: white;
+        }
+        .not-buggy {
+            background-color: #66cc66;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h2>Upload Source Code Data (CSV)</h2>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if results %}
+        <h3>Prediction Results</h3>
+        <table>
+            <tr>
+                <th>Method Name</th>
+                <th>Prediction</th>
+            </tr>
+            {% for row in results %}
+            <tr class="{{ 'buggy' if row.Prediction == 'Buggy' else 'not-buggy' }}">
+                <td>{{ row.Method }}</td>
+                <td>{{ row.Prediction }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Prediction</title>
+    <!-- <script>
+        function showExplanation(index) {
+            fetch(`/explain/${index}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    document.getElementById("lime-explanation").innerHTML = data.explanation;
+                    document.getElementById("explanation-modal").style.display = "block";
+                }
+            })
+            .catch(error => console.error("Error fetching explanation:", error));
+        }
+
+        function closeModal() {
+            document.getElementById("explanation-modal").style.display = "none";
+        }
+    </script> -->
+    <script>
+        function showExplanation(index) {
+            fetch(`/explain/${index}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    document.getElementById("lime-explanation").innerHTML = 
+                        `<img src="${data.image_url}" style="max-width:100%;">`;
+                    document.getElementById("explanation-modal").style.display = "block";
+                }
+            })
+            .catch(error => console.error("Error fetching explanation:", error));
+        }
+    
+        function closeModal() {
+            document.getElementById("explanation-modal").style.display = "none";
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .buggy {
+            background-color: #ff6666;
+            color: white;
+        }
+        .not-buggy {
+            background-color: #66cc66;
+            color: white;
+        }
+        .explain-btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            width: 60%;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .close-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Upload Source Code Data (CSV)</h2>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if results %}
+        <h3>Prediction Results</h3>
+        <table>
+            <tr>
+                <th>Method Name</th>
+                <th>Prediction</th>
+                <th>Explanation</th>
+            </tr>
+            {% for row in results %}
+            <tr class="{{ 'buggy' if row.Prediction == 'Buggy' else 'not-buggy' }}">
+                <td>{{ row.Method }}</td>
+                <td>{{ row.Prediction }}</td>
+                <td><button class="explain-btn" onclick="showExplanation('{{ row.Index }}')">Explain</button></td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <div id="explanation-modal" class="modal">
+        <div class="modal-content">
+            <h3>LIME Explanation</h3>
+            <div id="lime-explanation"></div>
+            <button class="close-btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+    
+</body>
+</html>

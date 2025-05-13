@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Prediction</title>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+    
+    <div class="main-container">
+        <div class="left-container">
+            <h2>Upload Source Code Data (CSV)</h2>
+            <form action="/" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" required>
+                <button type="submit">Predict</button>
+            </form>
+    
+            {% if results %}
+                <div class="summary-container">
+                    <h3>Summary of Predictions</h3>
+                    <div class="summary-text">
+                        <p><strong>File Name:</strong> {{ file_name }}</p>
+                        <p><strong> Total Methods: </strong> {{ total_methods }}</p>
+                        <p><strong> Buggy Methods: </strong> {{ buggy_count }} ({{ "%.2f"|format((buggy_count / total_methods * 100)) }}%)</p>
+                        <p><strong> Not Buggy Methods: </strong> {{ not_buggy_count }} ({{ "%.2f"|format((not_buggy_count / total_methods * 100)) }}%)</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    
+        {% if results %}
+            <div class="right-container">
+                <img src="{{ pie_chart_path }}" alt="Buggy vs Not Buggy Pie Chart">
+            </div>
+        {% endif %}
+    </div>
+    {% if results %}
+        <h3>Prediction Results</h3>
+        <table>
+            <tr>
+                <th>Method Name</th>
+                <th>Prediction</th>
+                <th>Explanation</th>
+            </tr>
+            {% for row in results %}
+            <tr class="{{ 'buggy' if row.Prediction == 'Buggy' else 'not-buggy' }}">
+                <td>{{ row.Method }}</td>
+                <td>{{ row.Prediction }}</td>
+                <td>
+                    <a href="{{ url_for('explanation', index=row.Index) }}" target="_blank">
+                        <button>Explain</button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    
+</body>
+</html>

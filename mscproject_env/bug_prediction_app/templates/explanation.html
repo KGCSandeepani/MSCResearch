@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Explanation for {{ method_name }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+    <h2>Explanation for: {{ method_name }}</h2>
+    <!-- <img src="{{ explanation_path }}" alt="LIME Explanation"> -->
+    <img src="{{ url_for('static', filename=explanation_path) }}" alt="LIME Explanation">
+
+    <div class="summary-container">
+        {% if etext %}
+            <h3>Explanation Details</h3>
+            <table>
+                <tr>
+                    <th>Feature</th>
+                    <th>Feature Description</th>
+                    <th>Contribution</th>   
+                    <th>Meaning</th>            
+                </tr>
+                {% for feature, disc, importance, meaning in etext %}
+                <tr>
+                    <td>{{ feature }}</td>
+                    <td>{{ disc }}</td>
+                    <td>{{ "%.4f"|format(importance) }}</td>  
+                    <td>{{ meaning }}</td>                 
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+</body>
+</html>
